@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Schedule</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --secondary: #4FC3F7;
+            --accent: #FF8A65;
+            --light: #F5F7FB;
+            --dark: #2D3748;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --group-lecture: #6C63FF;
+            --common-lecture: #4FC3F7;
+            --bg-color: #F5F7FB;
+            --text-color: #2D3748;
+            --card-bg: white;
+            --header-bg: #6C63FF;
+        }
+
+
+
+        .dark-mode {
+            --bg-color: #1A202C;
+            --text-color: #E2E8F0;
+            --card-bg: #2D3748;
+            --header-bg: #4A5568;
+            --light: #2D3748;
+            --common-lecture: #64B5F6;
+            --group-lecture: #7986CB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            position: relative;
+        }
+
+        .language-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-color);
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .current-date {
+            background: var(--card-bg);
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            font-weight: 500;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .control-btn {
+            background: var(--card-bg);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 120px;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-date {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        .day-schedule {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+
+        .day-title {
+            background: var(--header-bg);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day-title-date {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .schedule-table th {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .dark-mode .schedule-table th {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .schedule-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dark-mode .schedule-table td {
+            border-bottom: 1px solid #4A5568;
+        }
+
+        .schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .lecture-type {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+        }
+
+        .group-lecture-badge {
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--group-lecture);
+            border: 1px solid var(--group-lecture);
+        }
+
+        .combined-lecture-badge {
+            background: rgba(79, 195, 247, 0.1);
+            color: var(--common-lecture);
+            border: 1px solid var(--common-lecture);
+        }
+
+        .map-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+        }
+
+        .combined-lectures {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(79, 195, 247, 0.05);
+            border-radius: 8px;
+            border-left: 4px solid var(--common-lecture);
+        }
+
+        .dark-mode .combined-lectures {
+            background: rgba(79, 195, 247, 0.1);
+        }
+
+        .combined-title {
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--common-lecture);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .combined-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .combined-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: var(--card-bg);
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            align-items: center;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            margin-right: 8px;
+        }
+
+        .group-color {
+            background: var(--group-lecture);
+        }
+
+        .combined-color {
+            background: var(--common-lecture);
+        }
+
+        .day-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .day-content.active {
+            display: block;
+        }
+
+        /* زر Created By AY */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+        }
+
+        #created-by {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #4a90e2;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        #created-by:hover {
+            transform: scale(1.1) rotate(3deg);
+            color: #ff4081;
+        }
+
+        /* المحاضرة الحالية */
+        .current-lecture {
+            border: 2px solid #ff9800;
+            animation: glowing 1.5s infinite;
+        }
+
+        @keyframes glowing {
+            0% {
+                box-shadow: 0 0 5px #ff9800;
+            }
+
+            50% {
+                box-shadow: 0 0 15px #ff5722;
+            }
+
+            100% {
+                box-shadow: 0 0 5px #ff9800;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .schedule-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .tab {
+                width: 100%;
+                text-align: center;
+            }
+
+            .day-title {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <button class="language-toggle" id="language-toggle">
+                <i class="fas fa-language"></i>
+                <span>العربية</span>
+            </button>
+            <h1 data-en="University Schedule" data-ar="جدول المحاضرات">University Schedule</h1>
+            <p class="subtitle" data-en="Manage your lectures and never miss a class"
+                data-ar="نظم محاضراتك ولا تفوت أي محاضرة">Manage your lectures and never miss a class</p>
+            <div class="current-date" id="current-date">Monday, September 12, 2023</div>
+            <div class="controls">
+                <button class="control-btn" id="dark-mode-toggle">
+                    <i class="fas fa-moon"></i>
+                    <span data-en="Dark Mode" data-ar="الوضع الليلي">Dark Mode</span>
+                </button>
+                <button class="control-btn" id="notify-btn">
+                    <i class="fas fa-bell"></i>
+                    <span data-en="Notifications" data-ar="التنبيهات">Notifications</span>
+                </button>
+            </div>
+        </header>
+        <div class="tabs">
+            <div class="tab active" data-day="monday">
+                <span data-en="Monday" data-ar="الإثنين">Monday</span>
+                <span class="tab-date" id="monday-date">9/12</span>
+            </div>
+            <div class="tab" data-day="tuesday">
+                <span data-en="Tuesday" data-ar="الثلاثاء">Tuesday</span>
+                <span class="tab-date" id="tuesday-date">9/13</span>
+            </div>
+            <div class="tab" data-day="wednesday">
+                <span data-en="Wednesday" data-ar="الأربعاء">Wednesday</span>
+                <span class="tab-date" id="wednesday-date">9/14</span>
+            </div>
+            <div class="tab" data-day="thursday">
+                <span data-en="Thursday" data-ar="الخميس">Thursday</span>
+                <span class="tab-date" id="thursday-date">9/15</span>
+            </div>
+            <div class="tab" data-day="friday">
+                <span data-en="Friday" data-ar="الجمعة">Friday</span>
+                <span class="tab-date" id="friday-date">9/16</span>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color group-color"></div>
+                <span data-en="Group Lecture" data-ar="محاضرة المجموعة">Group Lecture</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color combined-color"></div>
+                <span data-en="Combined Lecture" data-ar="محاضرة مجمعة">Combined Lecture</span>
+            </div>
+        </div>
+
+        <div class="day-content active" id="monday-content">
+            <div class="day-schedule">
+                <div class="day-title">
+                    <span data-en="Monday - Group Lectures" data-ar="الإثنين - محاضرات المجموعة">Monday - Group
+                        Lectures</span>
+                    <span class="day-title-date" id="monday-full-date">September 12, 2023</span>
+                </div>
+
+                <div class="schedule-container">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th data-en="Time" data-ar="الوقت">Time</th>
+                                <th data-en="Subject" data-ar="المادة">Subject</th>
+                                <th data-en="Duration" data-ar="المدة">Duration</th>
+                                <th data-en="Dates" data-ar="التواريخ">Dates</th>
+                                <th data-en="Map" data-ar="الخريطة">Map</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>9:00 - 10:30</td>
+                                <td><span class="lecture-type group-lecture-badge" data-en="Group"
+                                        data-ar="مجموعة">Group</span><span data-en="Radiation Diagnostics"
+                                        data-ar="التشخيص الإشعاعي">Radiation Diagnostics</span></td>
+                                <td data-en="9 days" data-ar="9 أيام">9 days</td>
+                                <td>(20/10 - 27/10), (10/11 - 22/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/sgmu_imeni_v_i_razumovskogo_klinicheskiy_tsentr_universitetskaya_klinicheskaya_bolnitsa_1_imeni_s_r_mirotvortseva/1077889069?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>10:40 - 12:10</td>
+                                <td><span class="lecture-type group-lecture-badge" data-en="Group"
+                                        data-ar="مجموعة">Group</span><span data-en="Radiation Diagnostics"
+                                        data-ar="التشخيص الإشعاعي">Radiation Diagnostics</span></td>
+                                <td data-en="9 days" data-ar="9 أيام">9 days</td>
+                                <td>(20/10 - 27/10), (10/11 - 22/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/sgmu_imeni_v_i_razumovskogo_klinicheskiy_tsentr_universitetskaya_klinicheskaya_bolnitsa_1_imeni_s_r_mirotvortseva/1077889069?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>12:50 - 14:20</td>
+                                <td><span class="lecture-type group-lecture-badge" data-en="Group"
+                                        data-ar="مجموعة">Group</span><span data-en="Foreign Language (Russian)"
+                                        data-ar="اللغة الأجنبية (الروسية)">Foreign Language (Russian)</span></td>
+                                <td data-en="17 days" data-ar="17 يوم">17 days</td>
+                                <td>(01/09 - 27/10), (10/11 - 29/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskiy_gosudarstvenny_meditsinskiy_universitet_korpus_6/153223745452?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>15:00 - 16:30</td>
+                                <td><span class="lecture-type group-lecture-badge" data-en="Group"
+                                        data-ar="مجموعة">Group</span><span
+                                        data-en="Pathophysiology, Clinical Pathophysiology"
+                                        data-ar="الفيزيولوجيا المرضية">Pathophysiology, Clinical Pathophysiology</span>
+                                </td>
+                                <td data-en="15 days" data-ar="15 يوم">15 days</td>
+                                <td>(01/09 - 27/10), (10/11 - 15/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/sgmu_imeni_v_i_razumovskogo_korpus_4/1729447394?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>16:40 - 18:10</td>
+                                <td><span class="lecture-type group-lecture-badge" data-en="Group"
+                                        data-ar="مجموعة">Group</span><span
+                                        data-en="Pathophysiology, Clinical Pathophysiology"
+                                        data-ar="الفيزيولوجيا المرضية">Pathophysiology, Clinical Pathophysiology</span>
+                                </td>
+                                <td data-en="15 days" data-ar="15 يوم">15 days</td>
+                                <td>(01/09 - 27/10), (10/11 - 15/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/sgmu_imeni_v_i_razumovskogo_korpus_4/1729447394?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="combined-lectures">
+                    <div class="combined-title">
+                        <i class="fas fa-users"></i>
+                        <span data-en="Combined Lectures (All Groups)"
+                            data-ar="المحاضرات المجمعة (كل المجموعات)">Combined Lectures (All Groups)</span>
+                    </div>
+                    <div class="combined-list">
+                        <div class="combined-item">
+                            <div>
+                                <span class="lecture-type combined-lecture-badge" data-en="Combined"
+                                    data-ar="مجمعة">Combined</span>
+                                <strong data-en="Pharmacology" data-ar="علم الأدوية">Pharmacology</strong>
+                                <span>10:40 - 12:10</span>
+                            </div>
+
+
+                        </div>
+                        <div class="combined-item">
+                            <div>
+                                <span class="lecture-type combined-lecture-badge" data-en="Combined"
+                                    data-ar="مجمعة">Combined</span>
+                                <strong data-en="Hygiene" data-ar="الصحة العامة (النظافة)">Hygiene</strong>
+                                <span>8:30 - 10:00</span>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tuesday Content -->
+        <div class="day-content" id="tuesday-content">
+            <div class="day-schedule">
+                <div class="day-title">
+                    <span data-en="Tuesday - Group Lectures" data-ar="الثلاثاء - محاضرات المجموعة">Tuesday - Group
+                        Lectures</span>
+                    <span class="day-title-date" id="tuesday-full-date">September 13, 2023</span>
+                </div>
+                <div class="schedule-container">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th data-en="Time" data-ar="الوقت">Time</th>
+                                <th data-en="Subject" data-ar="المادة">Subject</th>
+                                <th data-en="Duration" data-ar="المدة">Duration</th>
+                                <th data-en="Dates" data-ar="التواريخ">Dates</th>
+                                <th data-en="Map" data-ar="الخريطة">Map</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>8:30 - 10:00</td>
+                                <td><span class="lecture-type group-lecture-badge" data-en="Group"
+                                        data-ar="مجموعة">Group</span><span data-en="Hygiene"
+                                        data-ar="الصحة العامة (النظافة)">Hygiene</span></td>
+                                <td data-en="12 days" data-ar="12 يوم">12 days</td>
+                                <td>(02/09 - 28/10), (11/11 - 25/11)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskiy_natsionalny_issledovatelskiy_gosudarstvenny_universitet_imeni_n_g_chernyshevskogo_korpus_2/78450789479?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>8:30 - 10:00</td>
+                                <td><span class="lecture-type group-lecture-badge" data-en="Group"
+                                        data-ar="مجموعة">Group</span><span data-en="General Surgery"
+                                        data-ar="الجراحة العامة">General Surgery</span></td>
+                                <td data-en="5 days" data-ar="5 أيام">5 days</td>
+                                <td>(02/12 - 30/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskaya_gorodskaya_klinicheskaya_bolnitsa_2_imeni_v_i_razumovskogo/1038757119?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>10:10 - 11:40</td>
+                                <td><span class="lecture-type group-lecture-badge" data-en="Group"
+                                        data-ar="مجموعة">Group</span><span data-en="Hygiene"
+                                        data-ar="الصحة العامة (النظافة)">Hygiene</span></td>
+                                <td data-en="12 days" data-ar="12 يوم">12 days</td>
+                                <td>(02/09 - 28/10), (11/11 - 25/11)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskiy_natsionalny_issledovatelskiy_gosudarstvenny_universitet_imeni_n_g_chernyshevskogo_korpus_2/78450789479?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>10:10 - 11:40</td>
+                                <td><span class="lecture-type group-lecture-badge" data-en="Group"
+                                        data-ar="مجموعة">Group</span><span data-en="General Surgery"
+                                        data-ar="الجراحة العامة">General Surgery</span></td>
+                                <td data-en="5 days" data-ar="5 أيام">5 days</td>
+                                <td>(02/12 - 30/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskaya_gorodskaya_klinicheskaya_bolnitsa_2_imeni_v_i_razumovskogo/1038757119?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>12:20 - 13:50</td>
+                                <td><span class="lecture-type group-lecture-badge" data-en="Group"
+                                        data-ar="مجموعة">Group</span><span data-en="Foreign Language (Russian)"
+                                        data-ar="اللغة الأجنبية (الروسية)">Foreign Language (Russian)</span></td>
+                                <td data-en="17 days" data-ar="17 يوم">17 days</td>
+                                <td>(02/09 - 28/10), (11/11 - 30/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskiy_gosudarstvenny_meditsinskiy_universitet_korpus_6/153223745452?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="combined-lectures">
+                <div class="combined-title">
+                    <i class="fas fa-users"></i>
+                    <span data-en="No Combined Lectures on Tuesday" data-ar="لا توجد محاضرات مجمعة يوم الثلاثاء">No
+                        Combined Lectures on Tuesday</span>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <!-- Wednesday Content -->
+        <div class="day-content" id="wednesday-content">
+            <div class="day-schedule">
+                <div class="day-title">
+                    <span data-en="Wednesday - Group Lectures" data-ar="الأربعاء - محاضرات المجموعة">Wednesday -
+                        Group Lectures</span>
+                    <span class="day-title-date" id="wednesday-full-date"></span>
+                </div>
+                <div class="schedule-container">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th data-en="Time" data-ar="الوقت">Time</th>
+                                <th data-en="Subject" data-ar="المادة">Subject</th>
+                                <th data-en="Duration" data-ar="المدة">Duration</th>
+                                <th data-en="Dates" data-ar="التواريخ">Dates</th>
+                                <th data-en="Map" data-ar="الخريطة">Map</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>12:20 - 13:50</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Pathological
+                                    Anatomy
+                                </td>
+                                <td>7 days</td>
+                                <td>(03/09, 17/09, 01/10, 15/10, 29/10, 12/11, 26/11)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskaya_gorodskaya_klinicheskaya_bolnitsa_2_imeni_v_i_razumovskogo/1038757119?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>13:20 - 14:50</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span> Pathological
+                                    Anatomy</td>
+                                <td>7 days</td>
+                                <td>(10/09, 24/09, 08/10, 22/10, 05/11, 19/11, 03/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskaya_gorodskaya_klinicheskaya_bolnitsa_2_imeni_v_i_razumovskogo/1038757119?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>14:00 - 15:30</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Pathological
+                                    Anatomy
+                                </td>
+                                <td>7 days</td>
+                                <td>(03/09, 17/09, 01/10, 15/10, 29/10, 12/11, 26/11)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskaya_gorodskaya_klinicheskaya_bolnitsa_2_imeni_v_i_razumovskogo/1038757119?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>15:00 - 16:30</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Pathological
+                                    Anatomy</td>
+                                <td>6 days</td>
+                                <td>(10/09, 24/09, 08/10, 22/10, 05/11, 19/11)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskaya_gorodskaya_klinicheskaya_bolnitsa_2_imeni_v_i_razumovskogo/1038757119?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="combined-lectures">
+                    <div class="combined-title"><i class="fas fa-users"></i> <span>Combined Lectures</span>
+                    </div>
+                    <div class="combined-list">
+                        <div class="combined-item">
+                            <div><span class="lecture-type combined-lecture-badge">Combined</span><strong>Internal
+                                    Medicine Propaedeutics</strong><span>9:00 - 10:30</span></div>
+                        </div>
+                        <div class="combined-item">
+                            <div><span class="lecture-type combined-lecture-badge">Combined</span><strong>Radiation
+                                    Diagnostics</strong><span>9:00 - 10:30</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thursday Content -->
+        <div class="day-content" id="thursday-content">
+            <div class="day-schedule">
+                <div class="day-title"><span data-en="Thursday - Group Lectures"
+                        data-ar="الخميس - محاضرات المجموعة">Thursday - Group Lectures</span><span class="day-title-date"
+                        id="thursday-full-date"></span></div>
+                <div class="schedule-container">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Duration</th>
+                                <th>Dates</th>
+                                <th>Map</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>12:50 - 14:20</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Internal Medicine
+                                    Propaedeutics</td>
+                                <td>11 days</td>
+                                <td>(04/09 - 13/11)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/universitetskaya_klinicheskaya_bolnitsa_sgmu_1_imeni_s_r_mirotvortseva_korpus_3/55688462350?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>12:50 - 14:20</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Clinical
+                                    Biochemistry
+                                </td>
+                                <td>4 days</td>
+                                <td>(04/12 - 25/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskiy_natsionalny_issledovatelskiy_gosudarstvenny_universitet_imeni_n_g_chernyshevskogo_korpus_2/78450789479?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>14:30 - 16:00</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Internal Medicine
+                                    Propaedeutics</td>
+                                <td>11 days</td>
+                                <td>(04/09 - 13/11)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/universitetskaya_klinicheskaya_bolnitsa_sgmu_1_imeni_s_r_mirotvortseva_korpus_3/55688462350?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>14:30 - 16:00</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Clinical
+                                    Biochemistry
+                                </td>
+                                <td>4 days</td>
+                                <td>(04/12 - 25/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskiy_natsionalny_issledovatelskiy_gosudarstvenny_universitet_imeni_n_g_chernyshevskogo_korpus_2/78450789479?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="combined-lectures">
+                    <div class="combined-title"><i class="fas fa-users"></i><span>Combined Lectures</span></div>
+                    <div class="combined-list">
+                        <div class="combined-item">
+                            <div><span class="lecture-type combined-lecture-badge">Combined</span><strong>Physical
+                                    Education Elective</strong><span>10:00</span></div>
+                        </div>
+                        <div class="combined-item">
+                            <div><span
+                                    class="lecture-type combined-lecture-badge">Combined</span><strong>Pathophysiology</strong><span>10:40
+                                    - 12:10</span></div>
+                        </div>
+                        <div class="combined-item">
+                            <div><span class="lecture-type combined-lecture-badge">Combined</span><strong>General
+                                    Surgery</strong><span>10:40 - 12:10</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Friday Content -->
+        <div class="day-content" id="friday-content">
+            <div class="day-schedule">
+                <div class="day-title"><span data-en="Friday - Group Lectures"
+                        data-ar="الجمعة - محاضرات المجموعة">Friday - Group Lectures</span><span class="day-title-date"
+                        id="friday-full-date"></span></div>
+                <div class="schedule-container">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Duration</th>
+                                <th>Dates</th>
+                                <th>Map</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>8:30 - 10:00</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Microbiology,
+                                    Virology</td>
+                                <td>11 days</td>
+                                <td>(05/09 - 14/11)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskiy_natsionalny_issledovatelskiy_gosudarstvenny_universitet_imeni_n_g_chernyshevskogo_korpus_2/78450789479?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>8:30 - 10:00</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Radiation
+                                    Diagnostics
+                                </td>
+                                <td>4 days</td>
+                                <td>(05/12 - 26/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/sgmu_imeni_v_i_razumovskogo_klinicheskiy_tsentr_universitetskaya_klinicheskaya_bolnitsa_1_imeni_s_r_mirotvortseva/1077889069?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>10:10 - 11:40</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Microbiology,
+                                    Virology</td>
+                                <td>12 days</td>
+                                <td>(05/09 - 21/11)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskiy_natsionalny_issledovatelskiy_gosudarstvenny_universitet_imeni_n_g_chernyshevskogo_korpus_2/78450789479?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>10:10 - 11:40</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Radiation
+                                    Diagnostics
+                                </td>
+                                <td>4 days</td>
+                                <td>(05/12 - 26/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/sgmu_imeni_v_i_razumovskogo_klinicheskiy_tsentr_universitetskaya_klinicheskaya_bolnitsa_1_imeni_s_r_mirotvortseva/1077889069?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>12:20 - 13:50</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Pharmacology</td>
+                                <td>12 days</td>
+                                <td>(05/09 - 21/11)</td>
+                                <td><button class="map-btn" data-link="https://goo.gl/maps/example5"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>12:20 - 13:50</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>General Surgery
+                                </td>
+                                <td>4 days</td>
+                                <td>(28/11 - 19/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskaya_gorodskaya_klinicheskaya_bolnitsa_2_imeni_v_i_razumovskogo/1038757119?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>14:00 - 15:30</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>Pharmacology</td>
+                                <td>12 days</td>
+                                <td>(05/09 - 21/11)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/sgmu_uchebny_korpus_6_1/1739060623?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                            <tr>
+                                <td>14:00 - 15:30</td>
+                                <td><span class="lecture-type group-lecture-badge">Group</span>General Surgery
+                                </td>
+                                <td>3 days</td>
+                                <td>(28/11 - 12/12)</td>
+                                <td><button class="map-btn"
+                                        data-link="https://yandex.com/maps/org/saratovskaya_gorodskaya_klinicheskaya_bolnitsa_2_imeni_v_i_razumovskogo/1038757119?si=u9w7d2ut0hn728n83r612z1q9r"><i
+                                            class="fas fa-map-marker-alt"></i> <span data-en="Map"
+                                            data-ar="الخريطة">Map</span></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="combined-lectures">
+                    <div class="combined-title"><i class="fas fa-users"></i><span>No Combined Lectures</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+        <footer class="footer">
+            <a href="#" target="_blank" id="created-by">Created By AY</a>
+        </footer>
+
+        <!-- Wednesday to Friday content would follow the same pattern -->
+
+    </div>
+    <script>
+        // Set current date and calculate week dates    
+        const today = new Date();
+        const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.    
+        const dayOffset = currentDay === 0 ? 6 : currentDay - 1; // Adjust to make Monday the first day    
+
+        // Calculate dates for the week    
+        const weekDates = {};
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+        days.forEach((day, index) => {
+            const date = new Date(today);
+            date.setDate(today.getDate() - dayOffset + index);
+            weekDates[day] = date;
+        });
+
+        // Update date displays    
+        document.getElementById('current-date').textContent = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Update day headers with dates    
+        document.getElementById('monday-date').textContent = formatDate(weekDates.Monday);
+        document.getElementById('tuesday-date').textContent = formatDate(weekDates.Tuesday);
+        document.getElementById('wednesday-date').textContent = formatDate(weekDates.Wednesday);
+        document.getElementById('thursday-date').textContent = formatDate(weekDates.Thursday);
+        document.getElementById('friday-date').textContent = formatDate(weekDates.Friday);
+
+        document.getElementById('monday-full-date').textContent = weekDates.Monday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        document.getElementById('tuesday-full-date').textContent = weekDates.Tuesday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+        // Dark mode toggle    
+        document.getElementById('dark-mode-toggle').addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // Language toggle    
+        const languageToggle = document.getElementById('language-toggle');
+        let isArabic = false;
+
+        languageToggle.addEventListener('click', function () {
+            isArabic = !isArabic;
+            translatePage(isArabic);
+        });
+
+        function translatePage(isArabic) {
+            const lang = isArabic ? 'ar' : 'en';
+            document.documentElement.lang = lang;
+            document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
+
+            // Update language button    
+            languageToggle.innerHTML = isArabic ?
+                '<i class="fas fa-language"></i><span>English</span>' :
+                '<i class="fas fa-language"></i><span>العربية</span>';
+
+            // Translate all elements with data attributes    
+            document.querySelectorAll('[data-en], [data-ar]').forEach(element => {
+                if (element.getAttribute('data-en') && element.getAttribute('data-ar')) {
+                    element.textContent = isArabic ? element.getAttribute('data-ar') : element.getAttribute('data-en');
+                }
+            });
+
+            // Update dates to Arabic if needed    
+            if (isArabic) {
+                const arabicMonths = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+
+                document.getElementById('monday-full-date').textContent =
+                    `${weekDates.Monday.getDate()} ${arabicMonths[weekDates.Monday.getMonth()]} ${weekDates.Monday.getFullYear()}`;
+                document.getElementById('tuesday-full-date').textContent =
+                    `${weekDates.Tuesday.getDate()} ${arabicMonths[weekDates.Tuesday.getMonth()]} ${weekDates.Tuesday.getFullYear()}`;
+            } else {
+                document.getElementById('monday-full-date').textContent = weekDates.Monday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                document.getElementById('tuesday-full-date').textContent = weekDates.Tuesday.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+        }
+
+        function formatDate(date) {
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+
+        // Day tabs functionality    
+        const tabs = document.querySelectorAll('.tab');
+        const dayContents = document.querySelectorAll('.day-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs    
+                tabs.forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tab    
+                tab.classList.add('active');
+
+                // Hide all day contents    
+                dayContents.forEach(content => content.classList.remove('active'));
+                // Show the selected day content    
+                const dayId = `${tab.dataset.day}-content`;
+                document.getElementById(dayId).classList.add('active');
+            });
+        });
+
+        // Map buttons functionality    
+        document.querySelectorAll('.map-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const mapLink = this.getAttribute('data-link');
+                if (mapLink) {
+                    window.open(mapLink, '_blank');
+                } else {
+                    alert('Map link not available yet');
+                }
+            });
+        });
+
+        // زر التنبيهات
+        const notifyBtn = document.getElementById("notify-btn");
+        let notificationsEnabled = false;
+
+        notifyBtn.addEventListener("click", () => {
+            if (Notification.permission === "granted") {
+                notificationsEnabled = true;
+                alert("✅ Notifications enabled!");
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        notificationsEnabled = true;
+                        alert("✅ Notifications enabled!");
+                    }
+                });
+            }
+        });
+
+        // جلب كل المحاضرات
+        function getAllLectures() {
+            let lectures = [];
+            document.querySelectorAll(".schedule-table tbody tr").forEach(row => {
+                let timeCell = row.querySelector("td:first-child");
+                if (timeCell) {
+                    let times = timeCell.textContent.trim().split(" - ");
+                    if (times.length === 2) {
+                        lectures.push({
+                            row,
+                            start: times[0],
+                            end: times[1]
+                        });
+                    }
+                }
+            });
+            return lectures;
+        }
+
+        // تحويل HH:MM إلى Date اليوم
+        function timeToDate(timeStr) {
+            let [h, m] = timeStr.split(":").map(Number);
+            let d = new Date();
+            d.setHours(h, m, 0, 0);
+            return d;
+        }
+
+        // متابعة المحاضرات
+        function checkLectures() {
+            let now = new Date();
+            let lectures = getAllLectures();
+            let foundCurrent = false;
+
+            lectures.forEach(lec => {
+                let start = timeToDate(lec.start);
+                let end = timeToDate(lec.end);
+
+                // إزالة التحديد القديم
+                lec.row.classList.remove("current-lecture");
+
+                // إذا نحن داخل وقت المحاضرة
+                if (now >= start && now <= end) {
+                    lec.row.classList.add("current-lecture");
+                    foundCurrent = true;
+                }
+
+                // إشعار قبل 5 دقائق من بداية المحاضرة
+                if (notificationsEnabled) {
+                    let notifyTime = new Date(start.getTime() - 5 * 60 * 1000);
+                    if (
+                        now.getHours() === notifyTime.getHours() &&
+                        now.getMinutes() === notifyTime.getMinutes() &&
+                        Math.abs(now - notifyTime) < 60000 // أقل من دقيقة
+                    ) {
+                        new Notification("⏰ Lecture Reminder", {
+                            body: `Your next lecture starts at ${lec.start}`,
+                            icon: "https://cdn-icons-png.flaticon.com/512/2830/2830288.png"
+                        });
+                    }
+                }
+            });
+        }
+
+        setInterval(checkLectures, 60000); // فحص كل دقيقة
+        checkLectures();
+    </script>
+</body>
+
+</html>
