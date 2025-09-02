@@ -337,6 +337,46 @@
             color: #ff4081;
         }
 
+        .heart {
+            display: inline-block;
+            font-size: 18px;
+            /* حجم أصغر */
+            animation: pulse 2.5s infinite;
+            /* نبض أبطأ */
+            transition: transform 0.3s ease, text-shadow 0.3s ease;
+            cursor: pointer;
+            /* يخلي فيه تفاعل */
+        }
+
+        /* أنيميشن النبض */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            30% {
+                transform: scale(1.15);
+            }
+
+            50% {
+                transform: scale(1);
+            }
+
+            70% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* عند المرور بالماوس */
+        .heart:hover {
+            transform: scale(1.4);
+            text-shadow: 0 0 12px rgba(255, 0, 0, 0.7);
+        }
+
         /* المحاضرة الحالية */
         .current-lecture {
             border: 2px solid #ff9800;
@@ -950,7 +990,7 @@
 
 
         <footer class="footer">
-            <a href="#" target="_blank" id="created-by">Created By AY</a>
+            <a href="#" target="_blank" id="created-by">Made with <span class="heart">❤️</span> </a>
         </footer>
 
         <!-- Wednesday to Friday content would follow the same pattern -->
